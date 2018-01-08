@@ -12,7 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 using Xbim.Presentation.XplorerPluginSystem;
+
+
+//https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
+//https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview#creating-a-binding
 
 namespace XbimXplorer.ModelCheck
 {
@@ -48,7 +53,22 @@ namespace XbimXplorer.ModelCheck
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            
+
+
             TxtOut.AppendText(_parentWindow.GetOpenedModelFileName());
+        }
+
+        /// <summary>
+        /// open spl file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnOpenFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                TxtOut.AppendText(openFileDialog.FileName);
         }
     }
 }
