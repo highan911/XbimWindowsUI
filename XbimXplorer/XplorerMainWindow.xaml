@@ -148,6 +148,7 @@
                 <pt:EnumMenuItem SelectedValue="{Binding Viewport.CameraMode, ElementName=DrawingControl}" Header="CameraMode" />
                 -->
             </MenuItem>
+            <MenuItem x:Name="ModelCheckMenu" Header="_Check"/>
             <MenuItem Header="_About" Click="About_Click"/>
         </Menu>
 

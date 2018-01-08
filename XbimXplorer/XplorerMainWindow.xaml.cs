@@ -98,7 +98,7 @@ namespace XbimXplorer
             // initialise the internal elements of the UI that behave like plugins
             EvaluateXbimUiType(typeof(LogViewer.LogViewer));
             EvaluateXbimUiType(typeof(Commands.wdwCommands));
-
+            EvaluateXbimUiMenu(typeof(ModelCheck.ModelCheck));
             // attach window managment functions
             Closed += XplorerMainWindow_Closed;
             Loaded += XplorerMainWindow_Loaded;

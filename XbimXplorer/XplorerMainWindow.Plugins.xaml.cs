@@ -244,6 +244,12 @@ namespace XbimXplorer
                 menuHeader = menuHeader.Substring(12);
                 destMenu = ExportMenu;
             }
+            if (att.MenuText.StartsWith(@"Check/"))
+            {
+                menuHeader = menuHeader.Substring(6);
+                destMenu = ModelCheckMenu;
+            }
+
 
             var v = new MenuItem { Header = menuHeader, Tag = type };
             destMenu.Items.Add(v);
