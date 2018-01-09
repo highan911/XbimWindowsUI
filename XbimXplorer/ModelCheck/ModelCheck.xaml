@@ -38,7 +38,7 @@
             </ToolBar>
         </Grid>
 
-        <TreeView x:Name="selectList" Grid.Row="1" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneWay}" ItemTemplate="{StaticResource CheckBoxItemTemplate}">
+        <TreeView x:Name="selectList" Grid.Row="1" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneWay}" ItemTemplate="{StaticResource CheckBoxItemTemplate}" MouseDoubleClick="item_dbClick">
   
         </TreeView>
 

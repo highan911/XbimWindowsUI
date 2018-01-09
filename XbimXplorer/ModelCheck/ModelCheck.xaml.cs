@@ -55,9 +55,17 @@ namespace XbimXplorer.ModelCheck
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-            treedata();
-
             TxtOut.AppendText(_parentWindow.GetOpenedModelFileName());
+        }
+
+        private void item_dbClick(object sender, RoutedEventArgs e)
+        {
+            var menuItem = selectList.SelectedItem as RuleItem;
+
+            if (menuItem != null)
+            {
+                MessageBox.Show(menuItem.Name);   
+            }
         }
 
         /// <summary>
@@ -137,45 +145,6 @@ namespace XbimXplorer.ModelCheck
             selectList.ItemsSource = TreeViewList;
         }
 
-        private void treedata()
-        {
-            RuleItem root = new RuleItem("Weapons")
-            {
-                IsInitiallySelected = true,
-                Children =
-                {
-                    new RuleItem("Blades")
-                    {
-                        Children =
-                        {
-                            new RuleItem("Dagger"),
-                            new RuleItem("Machete"),
-                            new RuleItem("Sword"),
-                        }
-                    },
-                    new RuleItem("Vehicles")
-                    {
-                        Children =
-                        {
-                            new RuleItem("Apache Helicopter"),
-                            new RuleItem("Submarine"),
-                            new RuleItem("Tank"),
-                        }
-                    },
-                    new RuleItem("Guns")
-                    {
-                        Children =
-                        {
-                            new RuleItem("AK 47"),
-                            new RuleItem("Beretta"),
-                            new RuleItem("Uzi"),
-                        }
-                    },
-                }
-            };
-
-            root.Initialize();
-            selectList.ItemsSource = new List<RuleItem> { root };
-        }
+        
     }
 }
