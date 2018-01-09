@@ -53,8 +53,8 @@ namespace XbimXplorer.ModelCheck
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            
 
+            treedata();
 
             TxtOut.AppendText(_parentWindow.GetOpenedModelFileName());
         }
@@ -69,6 +69,73 @@ namespace XbimXplorer.ModelCheck
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
                 TxtOut.AppendText(openFileDialog.FileName);
+        }
+
+        private void btnTest_Click(object sender, RoutedEventArgs e)
+        {
+            List<RuleItem> Selected = new List<RuleItem>();
+
+            foreach(var tree in (List<RuleItem>)selectList.ItemsSource)
+            {
+                foreach(var subtree in tree.Children)
+                {
+                    foreach(var item in subtree.Children)
+                    {
+                        if(item.IsChecked == true)
+                        {
+                            Selected.Add(item);
+                        }
+                    }
+                }
+            }
+
+            foreach(var item in Selected)
+            {
+                TxtOut.AppendText(item.Name);
+            }
+
+
+        }
+
+        private void treedata()
+        {
+            RuleItem root = new RuleItem("Weapons")
+            {
+                IsInitiallySelected = true,
+                Children =
+                {
+                    new RuleItem("Blades")
+                    {
+                        Children =
+                        {
+                            new RuleItem("Dagger"),
+                            new RuleItem("Machete"),
+                            new RuleItem("Sword"),
+                        }
+                    },
+                    new RuleItem("Vehicles")
+                    {
+                        Children =
+                        {
+                            new RuleItem("Apache Helicopter"),
+                            new RuleItem("Submarine"),
+                            new RuleItem("Tank"),
+                        }
+                    },
+                    new RuleItem("Guns")
+                    {
+                        Children =
+                        {
+                            new RuleItem("AK 47"),
+                            new RuleItem("Beretta"),
+                            new RuleItem("Uzi"),
+                        }
+                    },
+                }
+            };
+
+            root.Initialize();
+            selectList.ItemsSource = new List<RuleItem> { root };
         }
     }
 }

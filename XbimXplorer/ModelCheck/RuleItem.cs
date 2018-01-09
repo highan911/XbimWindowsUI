@@ -17,56 +17,14 @@ namespace XbimXplorer.ModelCheck
 
         #endregion // Data
 
-        #region CreateFoos
 
-        public static List<RuleItem> CreateFoos()
-        {
-            RuleItem root = new RuleItem("Weapons")
-            {
-                IsInitiallySelected = true,
-                Children =
-                {
-                    new RuleItem("Blades")
-                    {
-                        Children =
-                        {
-                            new RuleItem("Dagger"),
-                            new RuleItem("Machete"),
-                            new RuleItem("Sword"),
-                        }
-                    },
-                    new RuleItem("Vehicles")
-                    {
-                        Children =
-                        {
-                            new RuleItem("Apache Helicopter"),
-                            new RuleItem("Submarine"),
-                            new RuleItem("Tank"),
-                        }
-                    },
-                    new RuleItem("Guns")
-                    {
-                        Children =
-                        {
-                            new RuleItem("AK 47"),
-                            new RuleItem("Beretta"),
-                            new RuleItem("Uzi"),
-                        }
-                    },
-                }
-            };
-
-            root.Initialize();
-            return new List<RuleItem> { root };
-        }
-
-        RuleItem(string name)
+        public RuleItem(string name)
         {
             this.Name = name;
             this.Children = new List<RuleItem>();
         }
 
-        void Initialize()
+        public void Initialize()
         {
             foreach (RuleItem child in this.Children)
             {
@@ -75,15 +33,14 @@ namespace XbimXplorer.ModelCheck
             }
         }
 
-        #endregion // CreateFoos
 
         #region Properties
 
-        public List<RuleItem> Children { get; private set; }
+        public List<RuleItem> Children { get;  set; }
 
-        public bool IsInitiallySelected { get; private set; }
+        public bool IsInitiallySelected { get;  set; }
 
-        public string Name { get; private set; }
+        public string Name { get;  set; }
 
         #region IsChecked
 

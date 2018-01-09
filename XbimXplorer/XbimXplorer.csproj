@@ -305,7 +305,6 @@
       <DependentUpon>ModelCheck.xaml</DependentUpon>
     </Compile>
     <Compile Include="ModelCheck\RuleItem.cs" />
-    <Compile Include="ModelCheck\VirtualToggleButton.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
     <Compile Include="PluginSystem\PluginConfiguration.cs" />
     <Compile Include="PluginSystem\PluginInformation.cs" />
