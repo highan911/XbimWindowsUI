@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using Xbim.Presentation.XplorerPluginSystem;
+using System.Xml;
 
 
 //https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
@@ -68,7 +69,9 @@ namespace XbimXplorer.ModelCheck
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
-                TxtOut.AppendText(openFileDialog.FileName);
+            {
+                xmlparser(openFileDialog.FileName);
+            }
         }
 
         private void btnTest_Click(object sender, RoutedEventArgs e)
@@ -95,6 +98,43 @@ namespace XbimXplorer.ModelCheck
             }
 
 
+        }
+
+        public void xmlparser(String path)
+        {
+            XmlDocument spldoc = new XmlDocument();
+            spldoc.PreserveWhitespace = false;
+            spldoc.Load(path);
+
+            XmlNode root = spldoc.DocumentElement;
+            XmlNodeList allcategory = root.SelectNodes("CATEGORY");
+
+            List<RuleItem> TreeViewList = new List<RuleItem>();
+
+            foreach (XmlNode category in allcategory)
+            {
+                Console.WriteLine(category.Attributes["name"].Value);
+                RuleItem RuleRoot = new RuleItem(category.Attributes["name"].Value);
+
+                foreach (XmlNode subcategory in category.ChildNodes)
+                {
+                    Console.WriteLine(subcategory.Attributes["name"].Value);
+                    RuleItem asubcategory = new RuleItem(subcategory.Attributes["name"].Value);
+                    foreach (XmlNode item in subcategory.ChildNodes)
+                    {
+                        RuleItem arule = new RuleItem(item.Attributes["name"].Value);
+                        asubcategory.Children.Add(arule);
+                        Console.WriteLine(item.Attributes["name"].Value);
+                    }
+                    RuleRoot.Children.Add(asubcategory);
+                }
+
+                RuleRoot.Initialize();
+                TreeViewList.Add(RuleRoot);
+
+            }
+
+            selectList.ItemsSource = TreeViewList;
         }
 
         private void treedata()
