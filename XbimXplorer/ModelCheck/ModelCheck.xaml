@@ -27,22 +27,28 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="5*"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" >
             <ToolBar x:Name="toolBar" VerticalAlignment="Top">
                 <Button Content="File" Click="btnOpenFile_Click"></Button>
                 <Button Content="Settings" Click="Button_Click"/>
                 <Button Content="test" Click="btnTest_Click"></Button>
+                <Button Content="Check" Click="btnCheck_Click"/>
             </ToolBar>
         </Grid>
 
-        <TreeView x:Name="selectList" Grid.Row="1" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneWay}" ItemTemplate="{StaticResource CheckBoxItemTemplate}" MouseDoubleClick="item_dbClick">
+        <TreeView x:Name="selectList" Grid.Row="1" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneWay}" ItemTemplate="{StaticResource CheckBoxItemTemplate}"  MouseLeftButtonUp="item_dbClick">
   
         </TreeView>
 
-        <RichTextBox x:Name="TxtOut" Grid.Row="2" FontFamily="Lucida Console" Background="#FFFFFFE1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+        <TextBox x:Name="RuleContent" Grid.Row="2" TextWrapping="Wrap" AcceptsReturn="True">
+            
+        </TextBox>
+
+        <RichTextBox x:Name="TxtOut" Grid.Row="3" FontFamily="Lucida Console" Background="#FFFFFFE1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
 
         </RichTextBox>
         

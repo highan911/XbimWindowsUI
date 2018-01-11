@@ -42,6 +42,8 @@ namespace XbimXplorer.ModelCheck
 
         public string Name { get;  set; }
 
+        public string Text { get; set; }
+
         #region IsChecked
 
         /// <summary>
