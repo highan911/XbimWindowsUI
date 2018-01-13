@@ -17,7 +17,6 @@ using Xbim.Presentation.XplorerPluginSystem;
 using System.Xml;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 //https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
@@ -61,6 +60,7 @@ namespace XbimXplorer.ModelCheck
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            RuleContent.Text = typeof(ModelCheck).Assembly.Location;
 
            // TxtOut.AppendText(_parentWindow.GetOpenedModelFileName());
         }
@@ -92,8 +92,11 @@ namespace XbimXplorer.ModelCheck
 
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
-            ResultRow data = new ResultRow { Item = "2.1", ErrorCount = "2", ErrorType = "ff", PassStatus = "fff" };
-            ResultGrid.Items.Add(data);
+            string runtime_path = typeof(ModelCheck).Assembly.Location;
+            string dir = System.IO.Path.GetDirectoryName(runtime_path);
+
+            RuleContent.Text = dir;
+
             //TxtOut.AppendText(ts); 
         }
 
@@ -133,7 +136,7 @@ namespace XbimXplorer.ModelCheck
             //String normPath = SplPath;
             String modelPath = _parentWindow.GetOpenedModelFileName();
             
-            process.StartInfo.FileName = "E:\\BC.exe";
+            process.StartInfo.FileName = Config_Global.DIR+"\\BC.exe";
             process.StartInfo.Arguments = " -datafrom " + datafrom + " -checktype " + checkType + " -checkmode " + checkMode + " -normpath " + "\"" +normPath +"\"" +" -normsel " +"\"" +normSelector + "\""; // Note the /c command (*)
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardInput = true;

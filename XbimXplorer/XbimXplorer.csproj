@@ -307,6 +307,7 @@
     </Compile>
     <Compile Include="ModelCheck\CheckLog.cs" />
     <Compile Include="ModelCheck\CmdOutputTag.cs" />
+    <Compile Include="ModelCheck\Config_Global.cs" />
     <Compile Include="ModelCheck\ItemResultJsonData.cs" />
     <Compile Include="ModelCheck\ModelCheck.xaml.cs">
       <DependentUpon>ModelCheck.xaml</DependentUpon>
