@@ -305,8 +305,14 @@
     <Compile Include="LogViewer\LogViewer.xaml.cs">
       <DependentUpon>LogViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ModelCheck\CheckLog.cs" />
+    <Compile Include="ModelCheck\CmdOutputTag.cs" />
+    <Compile Include="ModelCheck\ItemResultJsonData.cs" />
     <Compile Include="ModelCheck\ModelCheck.xaml.cs">
       <DependentUpon>ModelCheck.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModelCheck\ResultShow.xaml.cs">
+      <DependentUpon>ResultShow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ModelCheck\RuleItem.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
@@ -358,6 +364,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ModelCheck\ModelCheck.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ModelCheck\ResultShow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

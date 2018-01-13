@@ -29,14 +29,16 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="6*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" >
             <ToolBar x:Name="toolBar" VerticalAlignment="Top">
-                <Button Content="File" Click="btnOpenFile_Click"></Button>
-                <Button Content="Settings" Click="Button_Click"/>
+                <Button Content="打开" Click="btnOpenFile_Click"></Button>
+                <Button Content="检查" Click="btnCheck_Click"/>
+                <Button Content="详细报告" Click="Button_Click"/>
                 <Button Content="test" Click="btnTest_Click"></Button>
-                <Button Content="Check" Click="btnCheck_Click"/>
+                
             </ToolBar>
         </Grid>
 
@@ -44,13 +46,22 @@
   
         </TreeView>
 
-        <TextBox x:Name="RuleContent" Grid.Row="2" TextWrapping="Wrap" AcceptsReturn="True">
-            
-        </TextBox>
+        <TextBox x:Name="RuleContent" Grid.Row="2" TextWrapping="Wrap" AcceptsReturn="True"/>
 
-        <RichTextBox x:Name="TxtOut" Grid.Row="3" FontFamily="Lucida Console" Background="#FFFFFFE1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+        <TextBox x:Name="ResultSummary" Grid.Row="3"/>
 
-        </RichTextBox>
+
+
+        <DataGrid Grid.Row="4" Name="ResultGrid"  AutoGenerateColumns="False" HorizontalGridLinesBrush="AliceBlue" VerticalGridLinesBrush="AliceBlue">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="条款编号" Width="*" Binding="{Binding Path=Item}"/>
+                <DataGridTextColumn Header="检查结果" Width="*" Binding="{Binding Path=PassStatus}"/>
+                <DataGridTextColumn Header="错误类型" Width="*" Binding="{Binding Path=ErrorType}"/>
+                <DataGridTextColumn Header="错误个数" Width="*" Binding="{Binding Path=ErrorCount}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        
         
     </Grid>
 </UserControl>

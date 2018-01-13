@@ -9,7 +9,7 @@
         </Style>
     </UserControl.Resources>
     <TabControl Background="#114682d4" x:Name="TheTabs" FontSize="10">
-        <TabItem Header="Object" x:Name="ObjectTab">
+        <TabItem Header="构件" x:Name="ObjectTab">
             <Grid>
                 <CheckBox Margin="3"
 				          Height="15"
@@ -129,7 +129,7 @@
                 </DataGrid>
             </Grid>
         </TabItem>
-        <TabItem Header="Type"
+        <TabItem Header="类型"
 		         x:Name="TypeTab">
             <DataGrid ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:IfcMetaDataControl}}, Path=TypeProperties}"
 			          ToolTip="Attributes of the Object"
@@ -166,7 +166,7 @@
                 </DataGrid.Columns>
             </DataGrid>
         </TabItem>
-        <TabItem Header="Materials"
+        <TabItem Header="材料"
 		         x:Name="MaterialTab">
             <DataGrid ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:IfcMetaDataControl}}, Path=MaterialGroups}"
 			          ToolTip="Attributes of the Object"
@@ -232,7 +232,7 @@
                 </DataGrid.GroupStyle>
             </DataGrid>
         </TabItem>
-        <TabItem Header="Properties"
+        <TabItem Header="属性"
 		         x:Name="PropertyTab">
             <DataGrid Name="PropertiesGrid"
 			          ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:IfcMetaDataControl}}, Path=PropertyGroups}"
@@ -300,7 +300,7 @@
                 </DataGrid.GroupStyle>
             </DataGrid>
         </TabItem>
-        <TabItem Header="Quantities"
+        <TabItem Header="数量"
 		         x:Name="QuantityTab">
             <DataGrid ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:IfcMetaDataControl}}, Path=Quantities}"
 			          ToolTip="Attributes of the Object"

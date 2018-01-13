@@ -18,7 +18,7 @@ using System.Xml;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 
 //https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
 //https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview#creating-a-binding
@@ -42,8 +42,9 @@ namespace XbimXplorer.ModelCheck
         /// <summary>
         /// Component's header text in the UI
         /// </summary>
-        public string WindowTitle => "Check";
+        public string WindowTitle => "模型检查";
         public string SplPath;
+        public Data_ResultJson data_ResultJson = null;
 
 
 
@@ -61,7 +62,7 @@ namespace XbimXplorer.ModelCheck
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-            TxtOut.AppendText(_parentWindow.GetOpenedModelFileName());
+           // TxtOut.AppendText(_parentWindow.GetOpenedModelFileName());
         }
 
         private void item_dbClick(object sender, RoutedEventArgs e)
@@ -91,8 +92,9 @@ namespace XbimXplorer.ModelCheck
 
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
-            String ts = GetSelectedNorm();
-            TxtOut.AppendText(ts); 
+            ResultRow data = new ResultRow { Item = "2.1", ErrorCount = "2", ErrorType = "ff", PassStatus = "fff" };
+            ResultGrid.Items.Add(data);
+            //TxtOut.AppendText(ts); 
         }
 
         public void Logger(String lines)
@@ -125,8 +127,10 @@ namespace XbimXplorer.ModelCheck
             String datafrom = "ifc";
             String checkType = "ConsistencyCheck";
             String checkMode = "1";
-            String normSelector = GetSelectedNorm();
-            String normPath = SplPath;
+            String normPath = "E:\\1实验室工作\\SPLdoc\\rulechecker功能基准测试.spl";
+            String normSelector = "2.2.1;2.2.3";
+            //String normSelector = GetSelectedNorm();
+            //String normPath = SplPath;
             String modelPath = _parentWindow.GetOpenedModelFileName();
             
             process.StartInfo.FileName = "E:\\BC.exe";
@@ -149,19 +153,94 @@ namespace XbimXplorer.ModelCheck
 
 
             StreamWriter myinput = process.StandardInput;
-            myinput.WriteLine(modelPath);
+            //myinput.WriteLine(modelPath);
+            myinput.WriteLine("E:\\1实验室工作\\SPLdoc\\AC20-Institute-Var-2.ifc");
             myinput.Close();
             //* Read the output (or the error)
             string output = process.StandardOutput.ReadToEnd();
             //Console.WriteLine(output);
             string err = process.StandardError.ReadToEnd();
             //Console.WriteLine(err);
-            TxtOut.AppendText(output);
-            TxtOut.AppendText(err);
+            ResultProcessing(output);
+            //TxtOut.AppendText(output);
+            //TxtOut.AppendText(err);
+            //showResult();
 
             process.WaitForExit();
 
         }
+
+        private void showResult(Data_ResultJson ResultJson)
+        {
+            ResultSummary.Text = ResultJson.ReportInfo.ToSummaryString();
+
+            List<string> itemKeyList = ResultJson.ItemResults.Keys.ToList();
+            itemKeyList.Sort();
+
+            foreach(string itemName in itemKeyList)
+            {
+                ItemResultJsonData item = ResultJson.ItemResults[itemName];
+                PassStatus passStatus = PassStatus.FromString(item.PassStatus);
+                if(passStatus == PassStatus.PASS)
+                {
+                    ResultRow newRow = new ResultRow() { Item=itemName, PassStatus = passStatus.ToString(), ErrorCount="", ErrorType=""};
+                    ResultGrid.Items.Add(newRow);
+                } else if(passStatus == PassStatus.NOTPASS)
+                {
+                    foreach(TaskResultJsonData taskResult in item.CheckResults)
+                    {
+                        if (!taskResult.Pass)
+                        {
+                            ResultRow newRow = new ResultRow() { Item = itemName, PassStatus = passStatus.ToString(), ErrorCount = taskResult.errCateCount, ErrorType = taskResult.ErrorType };
+                            ResultGrid.Items.Add(newRow);
+                        }
+
+                    }
+                }
+            }
+
+
+
+        }
+
+
+        private void ResultProcessing(String result)
+        {
+            string aLine = null;
+            StringReader strReader = new StringReader(result);
+            while(true)
+            {
+                aLine = strReader.ReadLine();
+                if(aLine != null)
+                {
+                    //Logger(aLine);
+                    StdOutCmdLine cmdLine = StdOutCmdLine.FromString(aLine);
+                    if(cmdLine != null)
+                    {
+                        if(CmdOutputTag.RESULT.Equals(cmdLine.Tag))
+                        {
+                            CheckLog.Logger(cmdLine.Data);
+                            Data_ResultJson result_json = JsonConvert.DeserializeObject<Data_ResultJson>(cmdLine.Data);
+                            if(result_json != null)
+                            {
+                                showResult(result_json);
+                                //ResultSummary.Text = result_json.ReportInfo.ToSummaryString();
+                                //CheckLog.Logger("haha"+result_json.ReportInfo.ToSummaryString());
+                            }
+
+                        }
+                    }
+                        
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+        }
+
 
         private String GetSelectedNorm()
         {
@@ -241,7 +320,8 @@ namespace XbimXplorer.ModelCheck
             String checkType = "ConsistencyCheck";
             String checkMode = "1";
             String normSelector = "2.2.1;2.2.3";
-            String normPath = SplPath;
+            //String normPath = SplPath;
+            String normPath = "E:\\1实验室工作\\SPLdoc\\rulechecker功能基准测试.spl";
             process.StartInfo.FileName = "F:\\VS2015Projects\\ConsoleApplication1\\ConsoleApplication1\\BC.exe";
             process.StartInfo.Arguments = "/c -datafrom " + datafrom + " -checkType " + checkType + " -checkMode " + checkMode + " -normPath " + normPath + " -normSelectedStr " + normSelector; // Note the /c command (*)
             process.StartInfo.UseShellExecute = false;
@@ -252,6 +332,7 @@ namespace XbimXplorer.ModelCheck
 
             StreamWriter myinput = process.StandardInput;
             myinput.WriteLine("E:\\1实验室工作\\SPLdoc\\AC20-Institute-Var-2.ifc");
+            //myinput.WriteLine(_parentWindow.GetOpenedModelFileName());
             myinput.Close();
             //* Read the output (or the error)
             string output = process.StandardOutput.ReadToEnd();
