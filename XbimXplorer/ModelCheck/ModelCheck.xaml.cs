@@ -29,7 +29,7 @@ namespace XbimXplorer.ModelCheck
     /// </summary>
     /// 
     [XplorerUiElement(PluginWindowUiContainerEnum.LayoutAnchorable, PluginWindowActivation.OnMenu,
-         "Check/ModelCheck")]
+         "Check/模型检查")]
     public partial class ModelCheck : IXbimXplorerPluginWindow
     {
         public ModelCheck()
@@ -130,10 +130,10 @@ namespace XbimXplorer.ModelCheck
             String datafrom = "ifc";
             String checkType = "ConsistencyCheck";
             String checkMode = "1";
-            String normPath = "E:\\1实验室工作\\SPLdoc\\rulechecker功能基准测试.spl";
-            String normSelector = "2.2.1;2.2.3";
-            //String normSelector = GetSelectedNorm();
-            //String normPath = SplPath;
+            //String normPath = "E:\\1实验室工作\\SPLdoc\\rulechecker功能基准测试.spl";
+            //String normSelector = "2.2.1;2.2.3";
+            String normSelector = GetSelectedNorm();
+            String normPath = SplPath;
             String modelPath = _parentWindow.GetOpenedModelFileName();
             
             process.StartInfo.FileName = Config_Global.DIR+"\\BC.exe";
@@ -156,8 +156,8 @@ namespace XbimXplorer.ModelCheck
 
 
             StreamWriter myinput = process.StandardInput;
-            //myinput.WriteLine(modelPath);
-            myinput.WriteLine("E:\\1实验室工作\\SPLdoc\\AC20-Institute-Var-2.ifc");
+            myinput.WriteLine(modelPath);
+            //myinput.WriteLine("E:\\1实验室工作\\SPLdoc\\AC20-Institute-Var-2.ifc");
             myinput.Close();
             //* Read the output (or the error)
             string output = process.StandardOutput.ReadToEnd();
