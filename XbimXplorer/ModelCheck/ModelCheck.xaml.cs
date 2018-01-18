@@ -83,13 +83,15 @@ namespace XbimXplorer.ModelCheck
         /// <param name="e"></param>
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog { Filter="spl files|*.spl"};
             if (openFileDialog.ShowDialog() == true)
             {
                 SplPath = openFileDialog.FileName;
                 xmlparser(openFileDialog.FileName);
             }
         }
+
+
 
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
@@ -125,6 +127,7 @@ namespace XbimXplorer.ModelCheck
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(SNLPath));
                 CheckLog.Logger(SNLPath);
                 XlsToSNL.xlsread();
+                XlsToSNL.GenerateSNL();
                 XlsToSNL.xml(SNLPath);
 
                 //加载config文件
@@ -189,10 +192,12 @@ namespace XbimXplorer.ModelCheck
 
         }
 
-        
+        int testcnt = 0;
 
         private void OutputHandler(object sendingProcess, DataReceivedEventArgs outline)
         {
+            testcnt++;
+            CheckLog.Logger("[" + testcnt + "]"+outline.Data);
             
             
             //this.RuleContent.Dispatcher.Invoke(new Action(delegate
@@ -201,6 +206,54 @@ namespace XbimXplorer.ModelCheck
             //}));
         }
 
+        private void btnTestCheck_Click(object sender, RoutedEventArgs e)
+        {
+            Process process = new Process();
+            String datafrom = "ifc";
+            String checkType = "ConsistencyCheck";
+            String checkMode = "1";
+            String normPath = "E:\\1实验室工作\\SPLdoc\\rulechecker功能基准测试.spl";
+            String normSelector = "2.2.1;2.2.3";
+            //String normSelector = GetSelectedNorm();
+            //String normPath = SplPath;
+            String modelPath = _parentWindow.GetOpenedModelFileName();
+
+            process.StartInfo.FileName = Config_Global.DIR + "\\BC.exe";
+            process.StartInfo.Arguments = " -datafrom " + datafrom + " -checktype " + checkType + " -checkmode " + checkMode + " -normpath " + "\"" + normPath + "\"" + " -normsel " + "\"" + normSelector + "\""; // Note the /c command (*)
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+
+
+            process.OutputDataReceived += new DataReceivedEventHandler(OutputHandler);
+            //process.ErrorDataReceived += new DataReceivedEventHandler(OutputHandler);
+
+
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+
+            StreamWriter myinput = process.StandardInput;
+            //myinput.WriteLine(modelPath);
+            myinput.WriteLine("E:\\1实验室工作\\SPLdoc\\AC20-Institute-Var-2.ifc");
+            myinput.Close();
+            //* Read the output (or the error)
+            //string output = process.StandardOutput.ReadToEnd();
+            //Console.WriteLine(output);
+            //string err = process.StandardError.ReadToEnd();
+            //Console.WriteLine(err);
+
+            //CheckLog.Logger("[test]" + output);
+
+
+            //ResultProcessing(output);
+            process.WaitForExit();
+
+        }
 
         private void btnCheck_Click(object sender, RoutedEventArgs e)
         {
@@ -213,6 +266,21 @@ namespace XbimXplorer.ModelCheck
             String normSelector = GetSelectedNorm();
             String normPath = SplPath;
             String modelPath = _parentWindow.GetOpenedModelFileName();
+
+
+            if (normSelector.Equals(""))
+            {
+                MessageBox.Show("请选择规则", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            if(normPath == null)
+            {
+                MessageBox.Show("请载入规则文件", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            if(modelPath == null)
+            {
+                MessageBox.Show("请载入模型文件", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
             
             process.StartInfo.FileName = Config_Global.DIR+"\\BC.exe";
             process.StartInfo.Arguments = " -datafrom " + datafrom + " -checktype " + checkType + " -checkmode " + checkMode + " -normpath " + "\"" +normPath +"\"" +" -normsel " +"\"" +normSelector + "\""; // Note the /c command (*)

@@ -164,6 +164,20 @@ namespace XbimXplorer
 
         void XplorerMainWindow_Closing(object sender, CancelEventArgs e)
         {
+            //删除docs文件夹以及所包含的全部内容
+            string SNLPath = ModelCheck.Config_Global.DIR + "\\docs";
+            if (Directory.Exists(SNLPath))
+            {
+                Directory.Delete(SNLPath, true);
+            }
+
+            //删除在程序运行路径生成的spl文件
+            var AllSplFiles = Directory.GetFiles(ModelCheck.Config_Global.DIR, "*.spl");
+            foreach (var file in AllSplFiles)
+                File.Delete(file);
+
+
+
             if (_worker != null && _worker.IsBusy)
             {
                 Log.Warn("Closing cancelled because of active background task.");

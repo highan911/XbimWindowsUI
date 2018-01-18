@@ -32,17 +32,19 @@ namespace XbimXplorer.ModelCheck
         public Klass classA;
         public Klass classB;
         public Klass classC;
+        public bool IsMandatory;
         public string SNL;
-        public Rule(Klass A, Klass B, Klass C, string SNL)
+        public Rule(Klass A, Klass B, Klass C, string SNL, bool IsMandatory)
         {
             classA = A;
             classB = B;
             classC = C;
             this.SNL = SNL;
+            this.IsMandatory = IsMandatory;
         }
         public string toString()
         {
-            return classA + " " + classB + " " + classC + " " + SNL;
+            return classA + " " + classB + " " + classC + " " + SNL + " " + IsMandatory;
         }
         public string getNum()
         {
@@ -62,6 +64,7 @@ namespace XbimXplorer.ModelCheck
         static int classA = 1;
         static int classB = 2;
         static int classC = 3;
+        static int Mandatory = 4;
         static int SNL = 7;
         static int headerRowCount = 6;
 
@@ -83,6 +86,37 @@ namespace XbimXplorer.ModelCheck
                 if (row == headerRowCount) break;
             }
 
+        }
+
+        public void GenerateSNL()
+        {
+            foreach (Rule rule in ruleSet)
+            {
+                //需要生成SNL的条件是：1.isMandatory = true 2.ClassB 是 “组成结构” 或者 “具有属性”
+                if (rule.IsMandatory && (rule.classB.text.Contains("组成结构") || rule.classB.text.Contains("具有属性")))
+                {
+                    //生成组成结构的SNL
+                    if (rule.classB.text.Contains("组成结构"))
+                    {
+                        string sub = rule.classA.text;
+                        string obj = rule.classC.text;
+                        string SNL = "所有 " + sub + " 有 " + obj;
+                        rule.SNL = SNL;
+                    }
+
+                    if (rule.classB.text.Contains("具有属性"))
+                    {
+                        string sub = rule.classA.text;
+                        string obj = rule.classC.text;
+                        string SNL = "所有 " + sub + " 有属性 " + obj;
+                        rule.SNL = SNL;
+                    }
+
+
+                    //Console.WriteLine(rule.toString());
+                }
+                //Console.WriteLine(rule.toString());
+            }
         }
 
         public void show()
@@ -287,6 +321,7 @@ namespace XbimXplorer.ModelCheck
             int B = 1;
             int C = 1;
             string curSNL = "";
+            bool curMandatory = false;
             do
             {
                 while (excelInfo.Read())
@@ -310,18 +345,31 @@ namespace XbimXplorer.ModelCheck
                         C = 1;
                     }
 
-                    //没有SNL语句的不放进去
-                    if (excelInfo.GetValue(classC) == null || excelInfo.GetValue(SNL) == null) continue;
+
 
 
                     curClassC = new Klass(excelInfo.GetValue(classC).ToString(), C++);
 
 
-                    curSNL = excelInfo.GetValue(SNL).ToString();
+                    curSNL = (excelInfo.GetValue(SNL) == null) ? null : excelInfo.GetValue(SNL).ToString();
 
+                    if (excelInfo.GetValue(Mandatory) != null && excelInfo.GetValue(Mandatory).ToString().Contains("必须"))
+                    {
+                        //Console.WriteLine(excelInfo.GetValue(Mandatory).ToString());
+                        curMandatory = true;
+                    }
+                    else
+                    {
+                        curMandatory = false;
+                    }
 
-                    Rule newRule = new Rule(curClassA, curClassB, curClassC, curSNL);
-                    ruleSet.Add(newRule);
+                    //只有classB是“具有属性”或者“组成结构”的才放入规则
+                    if (curClassB.text.Contains("组成结构") || curClassB.text.Contains("具有属性"))
+                    {
+                        Rule newRule = new Rule(curClassA, curClassB, curClassC, curSNL, curMandatory);
+                        ruleSet.Add(newRule);
+                    }
+
 
                 }
             } while (excelInfo.NextResult());
