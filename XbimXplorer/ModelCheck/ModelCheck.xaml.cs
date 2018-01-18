@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 
+
 //https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
 //https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview#creating-a-binding
 
@@ -100,22 +101,99 @@ namespace XbimXplorer.ModelCheck
             //TxtOut.AppendText(ts); 
         }
 
-        public void Logger(String lines)
+        private void btnXlsCheck_Click(object sender, RoutedEventArgs e)
         {
+            //打开xls
+            string xlsPath = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                xlsPath = openFileDialog.FileName;
+            }
 
-            // Write the string to a file.append mode is enabled so that the log
-            // lines get appended to  test.txt than wiping content and writing the log
+            //parse xls
+            if(xlsPath == null)
+            {
+                MessageBox.Show("规则文件为空", "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            RuleXLS XlsToSNL = new RuleXLS(xlsPath);
+            try
+            {
+                //储存SNL文件
+                string SNLPath = Config_Global.DIR + "\\docs\\Baselinelibrary\\" + System.IO.Path.GetFileNameWithoutExtension(xlsPath)+".snl";
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(SNLPath));
+                CheckLog.Logger(SNLPath);
+                XlsToSNL.xlsread();
+                XlsToSNL.xml(SNLPath);
 
-            System.IO.StreamWriter file = new System.IO.StreamWriter("E:\\test.txt", true);
-            file.WriteLine(lines);
+                //加载config文件
+                string ConfigPath = Config_Global.DIR + "\\default_config.cfg";
+                string config = File.ReadAllText(ConfigPath, Encoding.GetEncoding(1252));
+                CheckLog.Logger(config);
 
-            file.Close();
+                string ConfigNewPath = Config_Global.DIR + "\\docs\\Config\\" + System.IO.Path.GetFileNameWithoutExtension(xlsPath) + ".cfg";
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(ConfigNewPath));
+                System.IO.File.WriteAllText(ConfigNewPath, config, Encoding.GetEncoding(1252));
+
+            }
+            catch(Exception except)
+            {
+                MessageBox.Show("规则文件解析错误", "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+                CheckLog.Logger("[error]" + "btnXlsCheck_Click" + except.Data);
+                return;
+            }
+
+            try
+            {
+                Process process = new Process();
+                String outputdir = Config_Global.DIR + "\\" +System.IO.Path.GetFileNameWithoutExtension(xlsPath) + ".spl";
+                String filename = Config_Global.DIR + "\\docs\\Baselinelibrary\\" + System.IO.Path.GetFileNameWithoutExtension(xlsPath) + ".snl";
+
+                CheckLog.Logger(outputdir);
+                CheckLog.Logger(filename);
+
+                process.StartInfo.FileName = Config_Global.DIR + "\\baseline.exe";
+                process.StartInfo.Arguments = " -cmd -outdir " + outputdir + " -filename " + filename;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardInput = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.CreateNoWindow = true;
+
+
+
+
+
+                process.Start();
+
+
+                //* Read the output (or the error)
+                string output = process.StandardOutput.ReadToEnd();
+                //Console.WriteLine(output);
+                string err = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                SplPath = outputdir;
+                xmlparser(SplPath);
+
+            }
+            catch (Exception except)
+            {
+                MessageBox.Show("baseline调用错误", "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+                CheckLog.Logger("[error]" + "btnXlsCheck_Click, baseline" + except.Data);
+                return;
+
+            }
 
         }
 
+        
+
         private void OutputHandler(object sendingProcess, DataReceivedEventArgs outline)
         {
-            Logger(outline.Data);
+            
             
             //this.RuleContent.Dispatcher.Invoke(new Action(delegate
             //{
@@ -201,9 +279,6 @@ namespace XbimXplorer.ModelCheck
                     }
                 }
             }
-
-
-
         }
 
 
@@ -227,8 +302,6 @@ namespace XbimXplorer.ModelCheck
                             if(result_json != null)
                             {
                                 showResult(result_json);
-                                //ResultSummary.Text = result_json.ReportInfo.ToSummaryString();
-                                //CheckLog.Logger("haha"+result_json.ReportInfo.ToSummaryString());
                             }
 
                         }
@@ -316,34 +389,6 @@ namespace XbimXplorer.ModelCheck
             selectList.ItemsSource = TreeViewList;
         }
 
-        public void RunCheck()
-        {
-            Process process = new Process();
-            String datafrom = "ifc";
-            String checkType = "ConsistencyCheck";
-            String checkMode = "1";
-            String normSelector = "2.2.1;2.2.3";
-            //String normPath = SplPath;
-            String normPath = "E:\\1实验室工作\\SPLdoc\\rulechecker功能基准测试.spl";
-            process.StartInfo.FileName = "F:\\VS2015Projects\\ConsoleApplication1\\ConsoleApplication1\\BC.exe";
-            process.StartInfo.Arguments = "/c -datafrom " + datafrom + " -checkType " + checkType + " -checkMode " + checkMode + " -normPath " + normPath + " -normSelectedStr " + normSelector; // Note the /c command (*)
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardInput = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.Start();
-
-            StreamWriter myinput = process.StandardInput;
-            myinput.WriteLine("E:\\1实验室工作\\SPLdoc\\AC20-Institute-Var-2.ifc");
-            //myinput.WriteLine(_parentWindow.GetOpenedModelFileName());
-            myinput.Close();
-            //* Read the output (or the error)
-            string output = process.StandardOutput.ReadToEnd();
-            Console.WriteLine(output);
-            string err = process.StandardError.ReadToEnd();
-            Console.WriteLine(err);
-            process.WaitForExit();
-        }
         
     }
 }

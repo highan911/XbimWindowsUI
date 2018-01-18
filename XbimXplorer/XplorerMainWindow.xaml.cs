@@ -85,8 +85,8 @@ namespace XbimXplorer
             Dispatcher.BeginInvoke(new Action(delegate
             {
                 Title = string.IsNullOrEmpty(ifcFilename)
-                    ? "Xbim Xplorer" :
-                    "Xbim Xplorer - [" + ifcFilename + "]";
+                    ? "IFC模型检查" :
+                    "IFC模型检查 - [" + ifcFilename + "]";
             }));
         }
 

@@ -124,6 +124,10 @@
       <HintPath>..\packages\ManagedEsent.1.9.4\lib\net40\Esent.Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ExcelDataReader, Version=3.3.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.3.3.0\lib\net45\ExcelDataReader.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="HelixToolkit, Version=2015.1.715.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <HintPath>..\packages\HelixToolkit.2015.1.715\lib\portable-net4+sl4+wp71+win8\HelixToolkit.dll</HintPath>
       <Private>True</Private>
@@ -316,6 +320,7 @@
       <DependentUpon>ResultShow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ModelCheck\RuleItem.cs" />
+    <Compile Include="ModelCheck\RuleXLS.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
     <Compile Include="PluginSystem\PluginConfiguration.cs" />
     <Compile Include="PluginSystem\PluginInformation.cs" />
