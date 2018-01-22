@@ -15,6 +15,8 @@ namespace Xbim.Presentation.XplorerPluginSystem
         bool Activate();
         bool Focus();
         string GetOpenedModelFileName();
+        void ReportCheckProgress(string text);
+        void SetProgressBar(bool startMove);
         string GetAssemblyLocation(Assembly requestingAssembly);
 
     }

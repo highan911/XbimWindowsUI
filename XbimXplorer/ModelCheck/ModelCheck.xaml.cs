@@ -200,6 +200,8 @@ namespace XbimXplorer.ModelCheck
 
         private void doCheck(object sender, DoWorkEventArgs e)
         {
+            StopProgressBarAnimation(true);
+
             Process process = new Process();
             String datafrom = "ifc";
             String checkType = "ConsistencyCheck";
@@ -300,8 +302,11 @@ namespace XbimXplorer.ModelCheck
                     StdOutCmdLine cmdLine = StdOutCmdLine.FromString(aLine);
                     if(cmdLine != null)
                     {
+                        ReportProgress(cmdLine.Tag);
                         if(CmdOutputTag.RESULT.Equals(cmdLine.Tag))
                         {
+                            StopProgressBarAnimation(false);
+                            ReportProgress(cmdLine.Tag);
                             CheckLog.Logger(cmdLine.Data);
                             Data_ResultJson result_json = JsonConvert.DeserializeObject<Data_ResultJson>(cmdLine.Data);
                             if(result_json != null)
@@ -322,6 +327,22 @@ namespace XbimXplorer.ModelCheck
 
         }
 
+        private void ReportProgress(string text)
+        {
+            Dispatcher.BeginInvoke(new Action(delegate
+            {
+                _parentWindow.ReportCheckProgress(text);
+            }));
+
+        }
+
+        private void StopProgressBarAnimation(bool Stop)
+        {
+            Dispatcher.BeginInvoke(new Action(delegate
+            {
+                _parentWindow.SetProgressBar(Stop);
+            }));
+        }
 
         private String GetSelectedNorm()
         {

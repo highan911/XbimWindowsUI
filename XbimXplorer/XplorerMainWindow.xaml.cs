@@ -882,6 +882,25 @@ namespace XbimXplorer
             s.Show();
         }
 
+        //如果要把这里的函数暴露给ModelCheck,则需要在IXbimXplorerPluginMasterWindow中声明
+        public void ReportCheckProgress(string text)
+        {
+            StatusMsg.Text = text;
+            //ProgressBar.Value = 100;
+        }
+
+        /// <summary>
+        /// 传入true时，ProgressBar开始转动；传入false时停止
+        /// </summary>
+        /// <param name="isStop"></param>
+        public void SetProgressBar(bool startMove)
+        {
+            if (startMove)
+                ProgressBar.IsIndeterminate = true;
+            else
+                ProgressBar.IsIndeterminate = false;
+        }
+
         
     }
 }
