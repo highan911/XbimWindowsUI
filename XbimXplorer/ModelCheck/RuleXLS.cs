@@ -93,7 +93,7 @@ namespace XbimXplorer.ModelCheck
             foreach (Rule rule in ruleSet)
             {
                 //需要生成SNL的条件是：1.isMandatory = true 2.ClassB 是 “组成结构” 或者 “具有属性”
-                if (rule.IsMandatory && (rule.classB.text.Contains("组成结构") || rule.classB.text.Contains("具有属性")))
+                if (rule.IsMandatory && (rule.classB.text.Contains("组成结构") || rule.classB.text.Contains("具有属性") || rule.classB.text.Contains("几何表达")))
                 {
                     //生成组成结构的SNL
                     if (rule.classB.text.Contains("组成结构"))
@@ -110,6 +110,12 @@ namespace XbimXplorer.ModelCheck
                         string obj = rule.classC.text;
                         string SNL = "所有 " + sub + " 有属性 " + obj;
                         rule.SNL = SNL;
+                    }
+
+                    if (rule.classB.text.Contains("几何表达"))
+                    {
+                        string sub = rule.classA.text;
+                        rule.SNL = "所有 " + sub + " 有属性 Representation";
                     }
 
 
@@ -317,7 +323,7 @@ namespace XbimXplorer.ModelCheck
             Klass curClassA = null;
             Klass curClassB = null;
             Klass curClassC = null;
-            int A = 0;
+            int A = 1;
             int B = 1;
             int C = 1;
             string curSNL = "";
@@ -364,7 +370,7 @@ namespace XbimXplorer.ModelCheck
                     }
 
                     //只有classB是“具有属性”或者“组成结构”的才放入规则
-                    if (curClassB.text.Contains("组成结构") || curClassB.text.Contains("具有属性"))
+                    if (curClassB.text.Contains("组成结构") || curClassB.text.Contains("具有属性") || curClassB.text.Contains("几何表达"))
                     {
                         Rule newRule = new Rule(curClassA, curClassB, curClassC, curSNL, curMandatory);
                         ruleSet.Add(newRule);

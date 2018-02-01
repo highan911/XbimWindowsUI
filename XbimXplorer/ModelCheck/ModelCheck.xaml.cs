@@ -117,7 +117,7 @@ namespace XbimXplorer.ModelCheck
                 //储存SNL文件
                 string SNLPath = Config_Global.DIR + "\\docs\\Baselinelibrary\\" + System.IO.Path.GetFileNameWithoutExtension(xlsPath)+".snl";
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(SNLPath));
-                CheckLog.Logger(SNLPath);
+                
                 XlsToSNL.xlsread();
                 XlsToSNL.GenerateSNL();
                 XlsToSNL.xml(SNLPath);
@@ -125,7 +125,7 @@ namespace XbimXplorer.ModelCheck
                 //加载config文件
                 string ConfigPath = Config_Global.DIR + "\\default_config.cfg";
                 string config = File.ReadAllText(ConfigPath, Encoding.GetEncoding(1252));
-                CheckLog.Logger(config);
+                
 
                 string ConfigNewPath = Config_Global.DIR + "\\docs\\Config\\" + System.IO.Path.GetFileNameWithoutExtension(xlsPath) + ".cfg";
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(ConfigNewPath));
@@ -145,8 +145,7 @@ namespace XbimXplorer.ModelCheck
                 String outputdir = Config_Global.DIR + "\\" +System.IO.Path.GetFileNameWithoutExtension(xlsPath) + ".spl";
                 String filename = Config_Global.DIR + "\\docs\\Baselinelibrary\\" + System.IO.Path.GetFileNameWithoutExtension(xlsPath) + ".snl";
 
-                CheckLog.Logger(outputdir);
-                CheckLog.Logger(filename);
+
 
                 process.StartInfo.FileName = Config_Global.DIR + "\\baseline.exe";
                 process.StartInfo.Arguments = " -cmd -outdir " + outputdir + " -filename " + filename;
@@ -307,7 +306,7 @@ namespace XbimXplorer.ModelCheck
                         {
                             StopProgressBarAnimation(false);
                             ReportProgress(cmdLine.Tag);
-                            CheckLog.Logger(cmdLine.Data);
+                            
                             Data_ResultJson result_json = JsonConvert.DeserializeObject<Data_ResultJson>(cmdLine.Data);
                             if(result_json != null)
                             {

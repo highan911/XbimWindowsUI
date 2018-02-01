@@ -704,6 +704,7 @@ namespace XbimXplorer
             }
         }
 
+
         // this variable is used to determine when the user is trying again to double click on the selected item
         // from this we detect that he's probably not happy with the view, therefore we add a cutting plane to make the 
         // element visible.
@@ -724,6 +725,8 @@ namespace XbimXplorer
         {
             _camChanged = true;
         }
+
+        
 
 
         private void MenuItem_ZoomExtents(object sender, RoutedEventArgs e)
