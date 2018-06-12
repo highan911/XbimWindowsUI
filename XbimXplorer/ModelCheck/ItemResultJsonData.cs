@@ -3,16 +3,133 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace XbimXplorer.ModelCheck
 {
-
+    /// <summary>
+    /// 对应界面的结果显示栏
+    /// </summary>
     public class ResultRow
     {
+
+        private string passStatus;
+        
+        //条款编号
         public string Item { get; set; }
-        public string PassStatus { get; set; }
+        //"通过" or "不通过"
+        public string PassStatus
+        {
+            get
+            {
+                return passStatus;
+            }
+            set
+            {
+                passStatus = value;
+                if(value == "通过")
+                {
+                    ColorBrush = new SolidColorBrush(Color.FromRgb(204, 255, 204));
+                }
+                if (value == "不通过")
+                {
+                    ColorBrush = new SolidColorBrush(Color.FromRgb(255, 153, 153));
+                }
+            }
+        }
+        //"属性检查" or "几何检查" or "空间检查" 
         public string ErrorType { get; set; }
+        //条款不通过的构件数量
         public string ErrorCount { get; set; }
+        //错误构件list
+        public List<int> ErrorEntityLabels { get; set; }
+        //条款内容
+        public string ItemContent { get; set; }
+        //背景色
+        public SolidColorBrush ColorBrush { get; set; }
+
+        public override string ToString()
+        {
+            string str = "";
+            str += Item + '\n';
+            str += PassStatus + '\n';
+            str += ErrorType + '\n';
+            str += ErrorCount + '\n';
+            str += ItemContent + '\n';
+            foreach (var label in ErrorEntityLabels)
+            {
+                str += label.ToString() + " ";
+            }
+            return str;
+        }
+    }
+
+    public class PreCheckReportInfo
+    {
+        int geometryTotal = 0;
+        int geometryPass = 0;
+        int geometryNotPass = 0;
+
+        int structureTotal = 0;
+        int structurePass = 0;
+        int structureNotPass = 0;
+
+        int propertyTotal = 0;
+        int propertyPass = 0;
+        int propertyNotPass = 0;
+
+        public PreCheckReportInfo(List<ResultRow> rows)
+        {
+            foreach(var row in rows)
+            {
+                
+                if (row.ErrorType == "几何检查" && row.PassStatus == "通过")
+                    geometryPass++;
+                if (row.ErrorType == "几何检查" && row.PassStatus == "不通过")
+                    geometryNotPass++;
+                if (row.ErrorType == "空间检查" && row.PassStatus == "通过")
+                    structurePass++;
+                if (row.ErrorType == "空间检查" && row.PassStatus == "不通过")
+                    structureNotPass++;
+                if (row.ErrorType == "属性检查" && row.PassStatus == "通过")
+                    propertyPass++;
+                if (row.ErrorType == "属性检查" && row.PassStatus == "不通过")
+                    propertyNotPass++;
+
+            }
+            geometryTotal = geometryPass + geometryNotPass;
+            structureTotal = structurePass + structureNotPass;
+            propertyTotal = propertyPass + propertyNotPass;
+        }
+        
+
+        public double PassRate()
+        {
+            return (geometryPass + structurePass + propertyPass) / (double)(geometryTotal + structureTotal + propertyTotal);
+        }
+
+        public int PassTotal()
+        {
+            return geometryPass + structurePass + propertyPass;
+        }
+
+        public int RulesTotal()
+        {
+            return geometryTotal + structureTotal + propertyTotal;
+        }
+
+        public string GenerateSummary()
+        {
+            string resultSummary = "";
+
+            resultSummary += "共检查交付标准条款数量" + RulesTotal().ToString() + "条\n";
+            resultSummary += "通过率:"+String.Format("{2:0%}({0}/{1})", PassTotal(), RulesTotal(), PassRate()) + "；";
+            resultSummary += "不通过率:" + String.Format("{0:0%}({1}/{2})", 1 - PassRate(), RulesTotal() - PassTotal(), RulesTotal()) + '\n';
+
+
+            return resultSummary;
+        }
+
     }
 
     public class ItemResultJsonData
