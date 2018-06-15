@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XbimXplorer.ModelCheck"
         mc:Ignorable="d"
-        Title="ResultShow" Height="300" Width="300">
-    <Grid>
-        
+        Title="结果详情" Height="600" Width="600">
+    
+
+
+
+       <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="7*"/>
+        </Grid.RowDefinitions>
+        <TextBox  Text="Text" Foreground="Green" FontFamily="Tahoma"></TextBox>
     </Grid>
 </Window>

@@ -41,12 +41,15 @@ namespace XbimXplorer.ModelCheck
         public string ErrorType { get; set; }
         //条款不通过的构件数量
         public string ErrorCount { get; set; }
+        //条款检查的构件数量
+        public string EntityCheckCount { get; set; }
         //错误构件list
         public List<int> ErrorEntityLabels { get; set; }
         //条款内容
         public string ItemContent { get; set; }
         //背景色
         public SolidColorBrush ColorBrush { get; set; }
+
 
         public override string ToString()
         {
@@ -123,8 +126,19 @@ namespace XbimXplorer.ModelCheck
             string resultSummary = "";
 
             resultSummary += "共检查交付标准条款数量" + RulesTotal().ToString() + "条\n";
-            resultSummary += "通过率:"+String.Format("{2:0%}({0}/{1})", PassTotal(), RulesTotal(), PassRate()) + "；";
-            resultSummary += "不通过率:" + String.Format("{0:0%}({1}/{2})", 1 - PassRate(), RulesTotal() - PassTotal(), RulesTotal()) + '\n';
+            resultSummary += "通过率:"+String.Format("{2:0%}({0}条/{1}条)", PassTotal(), RulesTotal(), PassRate()) + "；";
+            resultSummary += "不通过率:" + String.Format("{0:0%}({1}条/{2}条)", 1 - PassRate(), RulesTotal() - PassTotal(), RulesTotal()) + '\n';
+
+            resultSummary += "---------------------\n";
+            resultSummary += "1. 属性检查：通过率" + String.Format("{0:0%}({1}条/{2}条)", propertyPass / (propertyTotal + 0.001), propertyPass, propertyTotal) + ';';
+            resultSummary += "不通过率：" + String.Format("{0:0%}({1}条/{2}条)", 1-propertyPass / (propertyTotal + 0.001), propertyPass, propertyTotal) + '\n';
+
+            resultSummary += "2. 空间检查：通过率" + String.Format("{0:0%}({1}条/{2}条)", structurePass / (structureTotal+0.001), structurePass, structureTotal) + ';';
+            resultSummary += "不通过率：" + String.Format("{0:0%}({1}条/{2}条)", 1 - structurePass / (structureTotal + 0.001), structurePass, structureTotal) + '\n';
+
+            resultSummary += "3. 几何检查：通过率" + String.Format("{0:0%}({1}条/{2}条)", geometryPass / (geometryTotal + 0.001), geometryPass, geometryTotal) + ';';
+            resultSummary += "不通过率：" + String.Format("{0:0%}({1}条/{2}条)", 1 - geometryPass / (geometryTotal + 0.001), geometryPass, geometryTotal) + '\n';
+
 
 
             return resultSummary;

@@ -391,6 +391,7 @@ namespace XbimXplorer.ModelCheck
             Result.PassStatus = "通过";
             Result.ErrorEntityLabels = new List<int>();
             Result.ItemContent = rule.Descript;
+            Result.EntityCheckCount = targetEntities.Count().ToString();
 
 
             //如果是属性检查
@@ -722,14 +723,6 @@ namespace XbimXplorer.ModelCheck
             IFCFile fileProperties = extractTool.getAllIfcProperty();
             string str = JsonConvert.SerializeObject(fileProperties);
             CheckLog.Logger("[info]" + str);
-
-            //var doors = curModel.Instances.OfType<IIfcDoor>();
-            //foreach(var door in doors)
-            //{
-            //    var obj = extractTool.getBasicInfo(door);
-            //    string str = JsonConvert.SerializeObject(obj);
-            //    CheckLog.Logger("[info]" + "getproperty" +str);
-            //}
 
         }
 
