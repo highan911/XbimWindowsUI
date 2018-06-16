@@ -58,6 +58,9 @@ namespace XbimXplorer.ModelCheck
         private List<RuleDetail> allRules;
         private List<RuleDetail> preRules;
 
+        //预检查检查结果
+        private List<ResultRow> result;
+
 
         private void InitializeBackgroundWorker()
         {
@@ -327,6 +330,9 @@ namespace XbimXplorer.ModelCheck
                     resultRows.Add(CheckSingleRule(file, rule));
                 }
                 showResultForPreCheck(resultRows);
+
+                //生成结果赋值
+                result = resultRows;
 
                 //生成总体描述
                 PreCheckReportInfo report = new PreCheckReportInfo(resultRows);
@@ -708,6 +714,17 @@ namespace XbimXplorer.ModelCheck
             DateTime after = System.DateTime.Now;
             TimeSpan ts = after.Subtract(before);
             CheckLog.Logger("[info]" + "时间统计" + ts);
+        }
+
+        private void btnReport_click(object sender, RoutedEventArgs e)
+        {
+            if(result == null)
+            {
+                MessageBox.Show("检查结果为空", "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            ResultShow reportWindow = new ResultShow(result);
+            reportWindow.Show();
         }
 
         //导出模型数据

@@ -19,9 +19,13 @@ namespace XbimXplorer.ModelCheck
     /// </summary>
     public partial class ResultShow : Window
     {
-        public ResultShow()
+        public ResultShow(List<ResultRow> report)
         {
             InitializeComponent();
+            ReportGrid.ItemsSource = report;
+            
+            PreCheckReportInfo reportInfo = new PreCheckReportInfo(report);
+            SummaryText.Text = reportInfo.GenerateSummary();
         }
     }
 }
