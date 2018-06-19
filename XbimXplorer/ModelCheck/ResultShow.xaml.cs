@@ -26,6 +26,14 @@ namespace XbimXplorer.ModelCheck
             
             PreCheckReportInfo reportInfo = new PreCheckReportInfo(report);
             SummaryText.Text = reportInfo.GenerateSummary();
+            
+        }
+
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ListBox listbox = (ListBox)sender;
+            string str = listbox.SelectedItem.ToString();
+            MessageBox.Show(str, "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

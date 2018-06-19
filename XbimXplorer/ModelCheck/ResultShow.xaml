@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XbimXplorer.ModelCheck"
         mc:Ignorable="d"
-        Title="结果详情" Height="600" Width="600">
+        Title="结果详情" Height="850" Width="600">
 
     <!--<Window.Resources>
         <Style TargetType="{x:Type Hyperlink}" x:Key="HyperlinkStyle">
@@ -41,12 +41,12 @@
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn Header="错误类型" Width="*" Binding="{Binding Path=ErrorType}"/>
-                <DataGridTextColumn Header="错误构件个数" Width="*" Binding="{Binding Path=ErrorCount}"/>
-                <DataGridTextColumn Header="检查构件总数" Width="*" Binding="{Binding Path=EntityCheckCount}"/>
-                <DataGridTemplateColumn Header="错误构件列表" Width="2*">
+                <DataGridTextColumn Header="错误个数" Width="*" Binding="{Binding Path=ErrorCount}"/>
+                <DataGridTextColumn Header="检查总数" Width="*" Binding="{Binding Path=EntityCheckCount}"/>
+                <DataGridTemplateColumn Header="错误构件列表" Width="1.5*" x:Name="errorlist">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ListBox ItemsSource="{Binding ErrorEntityLabels}">
+                            <ListBox  ItemsSource="{Binding ErrorEntityLabels}" MouseDoubleClick="ListBox_MouseDoubleClick">
                                 <ListBox.Template>
                                     <ControlTemplate TargetType="{x:Type ListBox}">
                                         <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
