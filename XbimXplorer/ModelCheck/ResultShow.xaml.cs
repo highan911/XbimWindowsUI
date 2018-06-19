@@ -33,7 +33,10 @@ namespace XbimXplorer.ModelCheck
         {
             ListBox listbox = (ListBox)sender;
             string str = listbox.SelectedItem.ToString();
-            MessageBox.Show(str, "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            XplorerMainWindow mainWindow  = Application.Current.Windows.OfType<XplorerMainWindow>().FirstOrDefault();
+            mainWindow.ElementFocused(Int32.Parse(str));
+            //MessageBox.Show(str, "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
