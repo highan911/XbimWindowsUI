@@ -764,39 +764,18 @@ namespace XbimXplorer
             w.Show();
         }
 
-        private void MyTest(object sender, RoutedEventArgs e)
+        public void ElementFocused(int label)
         {
-            //get one single door 
-            var id = "3Dc8D8bnfDE9AWDyBwtR6N";
-            //var theDoor = Model.Instances[18072];
-            //var type = theDoor.ExpressType.Properties;
 
-            var theDoor = Model.Instances.FirstOrDefault<IIfcProduct>(d => d.GlobalId == id);
+            var focusedElement = Model.Instances[label];
 
             _camChanged = false;
             DrawingControl.Viewport.Camera.Changed += Camera_Changed;
-            DrawingControl.SelectedEntity = theDoor;
+            DrawingControl.SelectedEntity = focusedElement;
             DrawingControl.ZoomSelected();
             DrawingControl.Viewport.Camera.Changed -= Camera_Changed;
             if (!_camChanged)
                 DrawingControl.ClipBaseSelected(0.15);
-
-      
-            Log.Info(theDoor.ExpressType.Name);
-
-
-            //var theDoor = Model.Instances.FirstOrDefault<type>(d => d.GlobalId == id);
-            //Console.WriteLine($"Door ID: {theDoor.GlobalId}, Name: {theDoor.Name}");
-
-            ////get all single-value properties of the door
-            //var properties = theDoor.IsDefinedBy
-            //    .Where(r => r.RelatingPropertyDefinition is IIfcPropertySet)
-            //    .SelectMany(r => ((IIfcPropertySet)r.RelatingPropertyDefinition).HasProperties)
-            //    .OfType<IIfcPropertySingleValue>();
-            //foreach (var property in properties)
-            //    Console.WriteLine($"Property: {property.Name}, Value: {property.NominalValue}");
-
-            //var instance = Model.Instances[14611];
 
         }
         
