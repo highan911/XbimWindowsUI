@@ -34,6 +34,7 @@ namespace XbimXplorer.ModelCheck
             ListBox listbox = (ListBox)sender;
             string str = listbox.SelectedItem.ToString();
             MessageBox.Show(str, "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+            
         }
     }
 }
