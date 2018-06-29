@@ -11,6 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ExcelDataReader;
+using System.IO;
+using OfficeOpenXml;
 
 namespace XbimXplorer.ModelCheck
 {
@@ -29,6 +32,23 @@ namespace XbimXplorer.ModelCheck
             
         }
 
+
+        private void editReport()
+        {
+            string export = Config_Global.DIR + "\\report.xlsx";
+            var stream = File.Open(export, FileMode.Open, FileAccess.Read);
+            var excelInfo = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+            ExcelPackage a;
+            
+
+        }
+
+        /// <summary>
+        /// 双击错误构件序号即可定位
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ListBox listbox = (ListBox)sender;

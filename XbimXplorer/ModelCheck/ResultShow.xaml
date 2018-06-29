@@ -20,10 +20,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="7*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBox  x:Name="SummaryText" FontFamily="Tahoma"></TextBox>
+        <TextBox x:Name="SummaryText" FontFamily="Tahoma" Grid.Row="0" Margin="0,301,0,0"/>
 
-        <DataGrid Grid.Row="4" Name="ReportGrid"  AutoGenerateColumns="False" HorizontalGridLinesBrush="AliceBlue" VerticalGridLinesBrush="AliceBlue" IsReadOnly="True">
+
+        <DataGrid Grid.Row="1" Name="ReportGrid"  AutoGenerateColumns="False" HorizontalGridLinesBrush="AliceBlue" VerticalGridLinesBrush="AliceBlue" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="条款编号" Width="*" Binding="{Binding Path=Item}"/>
                 <DataGridTextColumn Header="条款内容" Width="2*" Binding="{Binding Path=ItemContent}">
@@ -64,6 +66,10 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+
+        <Grid Grid.Row="1" Margin="0,548,0,0" Grid.RowSpan="2" >
+            <Button Content="导出报告" Margin="502,-10,30,10" Click="editReport"/>
+        </Grid>
 
     </Grid>
 </Window>
