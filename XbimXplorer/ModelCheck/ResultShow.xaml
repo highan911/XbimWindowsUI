@@ -5,24 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XbimXplorer.ModelCheck"
         mc:Ignorable="d"
-        Title="结果详情" Height="850" Width="600">
-
-    <!--<Window.Resources>
-        <Style TargetType="{x:Type Hyperlink}" x:Key="HyperlinkStyle">
-            <EventSetter Event="RequestNavigate" Handler="Hyperlink_RequestNavigate"/>
-        </Style>
-    </Window.Resources>-->
-
-
-
-
+        Title="结果详情" Height="650" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="7*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBox x:Name="SummaryText" FontFamily="Tahoma" Grid.Row="0" Margin="0,301,0,0"/>
+        
+        
+        <TextBox x:Name="SummaryText" FontFamily="Tahoma" Grid.Row="0"></TextBox>
 
 
         <DataGrid Grid.Row="1" Name="ReportGrid"  AutoGenerateColumns="False" HorizontalGridLinesBrush="AliceBlue" VerticalGridLinesBrush="AliceBlue" IsReadOnly="True">
@@ -67,8 +59,8 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Row="1" Margin="0,548,0,0" Grid.RowSpan="2" >
-            <Button Content="导出报告" Margin="502,-10,30,10" Click="editReport"/>
+        <Grid Grid.Row="2">
+            <Button Content="导出报告"  Click="ExportReport"/>
         </Grid>
 
     </Grid>

@@ -69,17 +69,17 @@ namespace XbimXplorer.ModelCheck
 
     public class PreCheckReportInfo
     {
-        int geometryTotal = 0;
-        int geometryPass = 0;
-        int geometryNotPass = 0;
+        public int geometryTotal = 0;
+        public int geometryPass = 0;
+        public int geometryNotPass = 0;
 
-        int structureTotal = 0;
-        int structurePass = 0;
-        int structureNotPass = 0;
+        public int structureTotal = 0;
+        public int structurePass = 0;
+        public int structureNotPass = 0;
 
-        int propertyTotal = 0;
-        int propertyPass = 0;
-        int propertyNotPass = 0;
+        public int propertyTotal = 0;
+        public int propertyPass = 0;
+        public int propertyNotPass = 0;
 
         public PreCheckReportInfo(List<ResultRow> rows)
         {
