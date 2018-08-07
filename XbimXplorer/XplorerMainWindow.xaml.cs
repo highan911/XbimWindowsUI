@@ -29,6 +29,7 @@ using Microsoft.Win32;
 using Xbim.Common;
 using Xbim.Common.Step21;
 using Xbim.Ifc;
+using Xbim.Ifc4.Interfaces;
 using Xbim.IO.Esent;
 using Xbim.ModelGeometry.Scene;
 using Xbim.Presentation;
@@ -68,6 +69,8 @@ namespace XbimXplorer
 
         private string _openedModelFileName;
 
+        private Xbim3DModelContext _context;
+
         /// <summary>
         /// Deals with the user-defined model file name.
         /// The underlying XbimModel might be pointing to a temporary file elsewhere.
@@ -76,6 +79,11 @@ namespace XbimXplorer
         public string GetOpenedModelFileName()
         {
             return _openedModelFileName;
+        }
+
+        public Xbim3DModelContext GetContext()
+        {
+            return _context;
         }
 
         private void SetOpenedModelFileName(string ifcFilename)
@@ -227,6 +235,10 @@ namespace XbimXplorer
                     var context = new Xbim3DModelContext(model);
                         //upgrade to new geometry representation, uses the default 3D model
                     context.CreateContext(progDelegate: worker.ReportProgress);
+                    
+                    //把context放在类中
+                    _context = context;
+                    
                 }
                 foreach (var modelReference in model.ReferencedModels)
                 {
@@ -239,6 +251,9 @@ namespace XbimXplorer
                     var context = new Xbim3DModelContext(modelReference.Model);
                     //upgrade to new geometry representation, uses the default 3D model
                     context.CreateContext(worker.ReportProgress);
+
+                    //把context放在类中
+                    _context = context;
                 }
                 if (worker.CancellationPending) //if a cancellation has been requested then don't open the resulting file
                 {
@@ -726,7 +741,6 @@ namespace XbimXplorer
             _camChanged = true;
         }
 
-        
 
 
         private void MenuItem_ZoomExtents(object sender, RoutedEventArgs e)
@@ -748,6 +762,21 @@ namespace XbimXplorer
                 Assemblies = _pluginAssemblies
             };
             w.Show();
+        }
+
+        public void ElementFocused(int label)
+        {
+
+            var focusedElement = Model.Instances[label];
+
+            _camChanged = false;
+            DrawingControl.Viewport.Camera.Changed += Camera_Changed;
+            DrawingControl.SelectedEntity = focusedElement;
+            DrawingControl.ZoomSelected();
+            DrawingControl.Viewport.Camera.Changed -= Camera_Changed;
+            if (!_camChanged)
+                DrawingControl.ClipBaseSelected(0.15);
+
         }
         
         private void DisplaySettingsPage(object sender, RoutedEventArgs e)
@@ -789,6 +818,12 @@ namespace XbimXplorer
         DrawingControl3D IXbimXplorerPluginMasterWindow.DrawingControl
         {
             get { return DrawingControl; }
+        }
+
+        //主窗口添加get property的接口
+        IfcMetaDataControl IXbimXplorerPluginMasterWindow.PropertiesControl
+        {
+            get { return PropertiesControl; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

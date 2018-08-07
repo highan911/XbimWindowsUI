@@ -811,7 +811,7 @@ namespace Xbim.Presentation
             All = 1
         }
 
-        public Color SelectionColor { get; set; } = Colors.Blue;
+        public Color SelectionColor { get; set; } = Colors.Red;
 
         /// <summary>
         /// Executed when a new entity is selected

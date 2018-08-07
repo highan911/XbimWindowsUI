@@ -19,6 +19,10 @@ using System.Diagnostics;
 using System.IO;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using Xbim.Common;
+using Xbim.Ifc;
+using Xbim.Ifc4.Interfaces;
+using Xbim.ModelGeometry.Scene;
 
 
 //https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
@@ -49,11 +53,25 @@ namespace XbimXplorer.ModelCheck
         public Data_ResultJson data_ResultJson = null;
         private BackgroundWorker CheckWorker;
 
+        //预检查所需数据
+        private BackgroundWorker preCheckWorker;
+        private List<RuleDetail> allRules;
+        private List<RuleDetail> preRules;
+
+        //预检查检查结果
+        private List<ResultRow> result;
+
+
         private void InitializeBackgroundWorker()
         {
             CheckWorker = new BackgroundWorker();
             CheckWorker.DoWork += new DoWorkEventHandler(doCheck);
+
+            preCheckWorker = new BackgroundWorker();
+            preCheckWorker.DoWork += new DoWorkEventHandler(doPreCheck);
         }
+
+        
 
 
 
@@ -63,8 +81,7 @@ namespace XbimXplorer.ModelCheck
         /// <param name="mainWindow"></param>
         public void BindUi(IXbimXplorerPluginMasterWindow mainWindow)
         {
-            _parentWindow = mainWindow;
-            
+            _parentWindow = mainWindow;           
             // whole datacontext binding, see http://stackoverflow.com/questions/8343928/how-can-i-create-a-binding-in-code-behind-that-doesnt-specify-a-path
         }
 
@@ -94,7 +111,7 @@ namespace XbimXplorer.ModelCheck
             }
         }
 
-
+        //旧版xls打开
         private void btnXlsCheck_Click(object sender, RoutedEventArgs e)
         {
             //打开xls
@@ -183,6 +200,58 @@ namespace XbimXplorer.ModelCheck
 
         }
 
+        /// <summary>
+        /// 新版交付标准打开
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnXlsDelivery_Click(object sender, RoutedEventArgs e)
+        {
+            //打开xls
+            string xlsPath = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Rules Files|*.xls;*.xlsx" };
+            if (openFileDialog.ShowDialog() == true)
+            {
+                xlsPath = openFileDialog.FileName;
+            }
+
+            //parse xls
+            if (xlsPath == null)
+            {
+                //MessageBox.Show("规则文件为空", "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            RuleDelivery deliveryFile = new RuleDelivery(xlsPath);
+            selectList.ItemsSource = deliveryFile.parseDelivery();
+            allRules = deliveryFile.parseDeliveryDetail();
+
+            
+
+
+
+        }
+
+
+
+        /// <summary>
+        /// 通过详细规则生成需要过滤的IFC集合
+        /// </summary>
+        /// <returns></returns>
+        private HashSet<string> GenerateIfcFromRules()
+        {
+            HashSet<string> targetSet = new HashSet<string>();
+            foreach(var rule in preRules)
+            {
+                if(!targetSet.Contains(rule.EntityIfd))
+                {
+                    targetSet.Add(rule.EntityIfd);
+                }
+            }
+            return targetSet;
+        }
+
+
 
         private void OutputHandler(object sendingProcess, DataReceivedEventArgs outline)
         {
@@ -193,12 +262,215 @@ namespace XbimXplorer.ModelCheck
 
         private void btnCheck_Click(object sender, RoutedEventArgs e)
         {
-            CheckWorker.RunWorkerAsync();
+            preCheckWorker.RunWorkerAsync();
+        }
+
+
+        /// <summary>
+        /// 根据选择的条款过滤preRules检查项
+        /// </summary>
+        /// <param name="normSelector">选中的条款</param>
+        private void normFilter(string normSelector)
+        {
+            //normSelector = 1.1.1:客户姓名;1.1.2:项目状态;1.1.3:我不存在;1.1.4:NumberOfStoreys;1.1.5:CompositionType
+            var normSelected = normSelector.Split(';');
+            HashSet<string> normNums = new HashSet<string>();
+            foreach(var norm in normSelected)
+            {
+                //过滤冒号以后的
+                int indexOfComma = norm.IndexOf(':');
+                normNums.Add(norm.Substring(0, indexOfComma));
+            }
+            preRules = allRules.Where<RuleDetail>(rule =>  normNums.Contains(rule.No) ).ToList();
+        }
+
+        /// <summary>
+        /// 模型预检查
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void doPreCheck(object sender, DoWorkEventArgs e)
+        {
+            DateTime before = System.DateTime.Now;
+            
+            
+            
+           
+
+            String modelPath = _parentWindow.GetOpenedModelFileName();
+            if (modelPath == null)
+            {
+                MessageBox.Show("请载入模型文件", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            String normSelector = GetSelectedNorm();
+            if (normSelector.Equals(""))
+            {
+                MessageBox.Show("请选择规则", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            normFilter(normSelector);
+
+
+
+
+
+
+            Dispatcher.BeginInvoke(new Action(delegate
+            {
+                HashSet<string> TargetIfcSet = GenerateIfcFromRules();
+                PropertyExtract extractHelper = new PropertyExtract(_parentWindow.Model, _parentWindow.GetContext());
+
+
+                //通过规则生成中间文件
+                IFCFile file = extractHelper.getFilterIfcProperty(TargetIfcSet);
+                List<ResultRow> resultRows = new List<ResultRow>();
+                foreach (var rule in preRules)
+                {
+                    resultRows.Add(CheckSingleRule(file, rule));
+                }
+                showResultForPreCheck(resultRows);
+
+                //生成结果赋值
+                result = resultRows;
+
+                //生成总体描述
+                PreCheckReportInfo report = new PreCheckReportInfo(resultRows);
+                ResultSummary.Text = report.GenerateSummary();
+
+
+            }));
+
+            DateTime after = System.DateTime.Now;
+            TimeSpan ts = after.Subtract(before);
+
+            CheckLog.Logger("[precheck时间]" + ts);
+
+
+
+
+        }
+
+
+
+        /// <summary>
+        /// 判断某个构件是否包含（包括structurecontain+aggregate两种关系）某种IFC
+        /// </summary>
+        /// <param name="entityLabel">被判断的构件的entitylabel</param>
+        /// <param name="ifcContained">被包含的IFC类型</param>
+        /// <param name="relContain">包含关系</param>
+        /// <returns></returns>
+        public bool judgeRelContainsHelper(int entityLabel, string ifcContained, SortedDictionary<int, List<int>> relContain, IfcStore model)
+        {
+            //所选实体不在relContain中，返回false
+            if (!relContain.ContainsKey(entityLabel)) return false;
+            //如果在relContain中，递归查找
+            var list = relContain[entityLabel];
+            foreach (var entity in list)
+            {
+                if (model.Instances[entity].ExpressType.ExpressNameUpper == ifcContained.ToUpper())
+                    return true;
+                if (judgeRelContainsHelper(entity, ifcContained, relContain, model))
+                    return true;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// 检查一个规则
+        /// </summary>
+        /// <param name="file">过滤后的IFC文件信息</param>
+        /// <param name="rule">某个规则</param>
+        private ResultRow CheckSingleRule(IFCFile file, RuleDetail rule)
+        {
+            IfcStore model = _parentWindow.Model;
+
+            //获取检查的实体是哪一个
+            var targetEntities = file.Elements.Where(i => i.TYPE.ToUpper() == rule.EntityIfd.ToUpper());
+
+            //bool result = true;
+            int ErrorCount = 0;
+
+            ResultRow Result = new ResultRow();
+            Result.Item = rule.No;
+            Result.PassStatus = "通过";
+            Result.ErrorEntityLabels = new List<int>();
+            Result.ItemContent = rule.Descript;
+            Result.EntityCheckCount = targetEntities.Count().ToString();
+
+
+            //如果是属性检查
+            if (rule.type == RuleType.Property)
+            {
+                Result.ErrorType = "属性检查";
+                foreach(var Entity in targetEntities)
+                {
+                    //存在实体并不含有这个属性或值为空
+                    if(!Entity.properties.ContainsKey(rule.content) || string.IsNullOrWhiteSpace(Entity.properties[rule.content]))
+                    {
+                        Result.PassStatus = "不通过";
+                        ErrorCount++;
+                        Result.ErrorEntityLabels.Add(Entity.LABEL);
+                    }
+                }
+
+            }
+            else if(rule.type == RuleType.Geometry)
+            {
+                Result.ErrorType = "几何检查";
+                foreach (var Entity in targetEntities)
+                {
+                    //几何不对
+                    if(!Entity.properties["Representation"].ToUpper().Contains(rule.content.ToUpper()))
+                    {
+                        Result.PassStatus = "不通过";
+                        ErrorCount++;
+                        Result.ErrorEntityLabels.Add(Entity.LABEL);
+                    }
+                }
+            }
+            else if(rule.type == RuleType.Structure)
+            {
+                Result.ErrorType = "空间检查";
+                SortedDictionary<int, List<int>> relContain = file.Rels["isContaining"];
+                //空间检查需要注意Ifcwall的多种形式
+                if(rule.content.ToUpper() == "IFCWALL" || rule.content.ToUpper() == "IFCWALLSTANDARDCASE" || rule.content.ToUpper() == "IFCWALLELMENTEDCASE")
+                {
+                    foreach (var Entity in targetEntities)
+                    {
+                        if (!judgeRelContainsHelper(Entity.LABEL, "IFCWALL", relContain, model) && !judgeRelContainsHelper(Entity.LABEL, "IFCWALLSTANDARDCASE", relContain, model) && !judgeRelContainsHelper(Entity.LABEL, "IFCWALLELMENTEDCASE", relContain, model))
+                        {
+                            Result.PassStatus = "不通过";
+                            ErrorCount++;
+                            Result.ErrorEntityLabels.Add(Entity.LABEL);
+                        }
+
+                    }
+                } else
+                {
+                    foreach (var Entity in targetEntities)
+                    {
+                        if (!judgeRelContainsHelper(Entity.LABEL, rule.content, relContain, model))
+                        {
+                            Result.PassStatus = "不通过";
+                            ErrorCount++;
+                            Result.ErrorEntityLabels.Add(Entity.LABEL);
+                        }
+
+                    }
+                }
+
+            }
+            Result.ErrorCount = ErrorCount.ToString();
+            return Result;
         }
 
 
         private void doCheck(object sender, DoWorkEventArgs e)
         {
+            DateTime before = System.DateTime.Now;
+
             StopProgressBarAnimation(true);
 
             Process process = new Process();
@@ -251,8 +523,29 @@ namespace XbimXplorer.ModelCheck
             myinput.Close();
             process.WaitForExit();
 
+            DateTime after = System.DateTime.Now;
+
+            TimeSpan ts = after.Subtract(before);
+
+            CheckLog.Logger("[check时间]" + ts);
+
         }
         
+        /// <summary>
+        /// 显示预检查的结果：总体+表格
+        /// </summary>
+        /// <param name="results">对于所有条款的检查结果</param>
+        private void showResultForPreCheck(List<ResultRow> results)
+        {
+            Dispatcher.BeginInvoke(new Action(delegate
+            {
+                ResultGrid.Items.Clear();
+                foreach(var Row in results)
+                {
+                    ResultGrid.Items.Add(Row);
+                }              
+            }));
+        }
 
         private void showResult(Data_ResultJson ResultJson)
         {
@@ -414,6 +707,41 @@ namespace XbimXplorer.ModelCheck
             selectList.ItemsSource = TreeViewList;
         }
 
-        
+        private void btnExtract_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime before = System.DateTime.Now;
+            getProperties();
+            DateTime after = System.DateTime.Now;
+            TimeSpan ts = after.Subtract(before);
+            CheckLog.Logger("[info]" + "时间统计" + ts);
+        }
+
+        private void btnReport_click(object sender, RoutedEventArgs e)
+        {
+            if(result == null)
+            {
+                MessageBox.Show("检查结果为空", "Alert", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            ResultShow reportWindow = new ResultShow(result);
+            reportWindow.Show();
+        }
+
+        //导出模型数据
+        private void getProperties()
+        {
+            
+            IfcStore curModel = _parentWindow.Model;
+            Xbim3DModelContext context = _parentWindow.GetContext();
+            PropertyExtract extractTool = new PropertyExtract(curModel, context);
+
+            //CheckLog.Logger(curModel.Instances.CountOf<IIfcProduct>().ToString());
+
+            IFCFile fileProperties = extractTool.getAllIfcProperty();
+            string str = JsonConvert.SerializeObject(fileProperties);
+            CheckLog.Logger("[info]" + str);
+
+        }
+
     }
 }

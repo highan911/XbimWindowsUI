@@ -35,8 +35,9 @@
         <Grid Grid.Row="0" >
             <ToolBar x:Name="toolBar" VerticalAlignment="Top">
                 <Button Content="载入SPL" Click="btnOpenFile_Click"></Button>
-                <Button Content="载入交付标准" Click="btnXlsCheck_Click"></Button>
+                <Button Content="载入交付标准" Click="btnXlsDelivery_Click"></Button>
                 <Button Content="检查" Click="btnCheck_Click"/>
+                <Button Content="详细报告" Click="btnReport_click"></Button>
             </ToolBar>
         </Grid>
 
@@ -53,7 +54,13 @@
         <DataGrid Grid.Row="4" Name="ResultGrid"  AutoGenerateColumns="False" HorizontalGridLinesBrush="AliceBlue" VerticalGridLinesBrush="AliceBlue" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="条款编号" Width="*" Binding="{Binding Path=Item}"/>
-                <DataGridTextColumn Header="检查结果" Width="*" Binding="{Binding Path=PassStatus}"/>
+                <DataGridTextColumn Header="检查结果" Width="*" Binding="{Binding Path=PassStatus}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Background" Value="{Binding Path=ColorBrush}"/>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="错误类型" Width="*" Binding="{Binding Path=ErrorType}"/>
                 <DataGridTextColumn Header="错误个数" Width="*" Binding="{Binding Path=ErrorCount}"/>
             </DataGrid.Columns>

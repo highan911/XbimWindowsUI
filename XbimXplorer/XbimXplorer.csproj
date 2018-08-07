@@ -120,6 +120,10 @@
   <PropertyGroup />
   <PropertyGroup />
   <ItemGroup>
+    <Reference Include="EPPlus, Version=4.5.2.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.2.1\lib\net40\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Esent.Interop, Version=1.9.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedEsent.1.9.4\lib\net40\Esent.Interop.dll</HintPath>
       <Private>True</Private>
@@ -180,6 +184,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Globalization" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.IO.Compression" />
@@ -316,9 +321,11 @@
     <Compile Include="ModelCheck\ModelCheck.xaml.cs">
       <DependentUpon>ModelCheck.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ModelCheck\Property.cs" />
     <Compile Include="ModelCheck\ResultShow.xaml.cs">
       <DependentUpon>ResultShow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ModelCheck\RuleDelivery.cs" />
     <Compile Include="ModelCheck\RuleItem.cs" />
     <Compile Include="ModelCheck\RuleXLS.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
